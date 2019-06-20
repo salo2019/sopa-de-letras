@@ -1,0 +1,1 @@
+{"wikidictionary": ["reir", "policia", "policia", "reir", "PERRO", "reir", "patorubic", "cancion"], "pattern": ["ahre", "pocho", "pipo", "mono"]}
