@@ -130,11 +130,21 @@ class Palabra:
 		else: cadena="problema_wik"		
 		defini=""	
 		if esClasificado:
+			
+			# ******* A CONTINUACIÓN EN EL "TRY" *******
+			# a[0].content es un string que contiene el título de Etimología + un espacio en blanco + definición de la palabra
+			# Convierto en lista el string anterior para filtrar, en una nueva lista, el título de Etimología + el espacio en blanco
+			# La lista "lis" contendrá sólo la definición de la palabra 
+			
 			try:
 				b = list(filter(lambda x: x.title == "Español",article.sections))			
 				#print(b[0].children)
 				a = list(filter(lambda x: x.title in "Etimología",b[0].children))
-				defini=a[0].content
+				#defini=a[0].content
+				listaDefinicion = []
+				listaDefinicion = (a[0].content).split('\n')
+				li = list(filter(lambda x: x != '' and "Etimología" not in x, listaDefinicion))
+				defini = '\n'.join(li)
 			except IndexError:
 				defini = sg.PopupGetText('Ingrese definicion:', 'No existe definicion de la palabra')
 		return [cadena,esClasificado,defini]
@@ -317,7 +327,8 @@ def configurarYa():
 	promedio= calcularPromedio(listaDeOficina)
 	#calculo el color que va tener la sopa
 	color= calcularColorSopa(promedio)
-	#print("LA OFICINA ",oficina,"tiene un color ",color)		
+	#print("LA OFICINA ",oficina,"tiene un color ",color)	
+	window.Close()	
 
 	
 	
@@ -483,12 +494,41 @@ def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop):
 	dictioPalabrasAbuscar={"sustantivo":{},"adjetivo":{},"verbo":{}}
 	maximo=0
 
-	#diccionario de las definiciones
+	#diccionario de las definiciones en el cual la clave es la palabra y el valor la deficinicion.
 	diccioDef={}
 	for p in lista:
-		diccioDef[p.getPalabra()]=p.getDefinicion() #completo el diccionario de definiciones para la Ayuda Minima 
+		cadena = ''
+		cadena = p.getDefinicion()
+		diccioDef[p.getPalabra()] = cadena #completo el diccionario de definiciones para la Ayuda Minima 
 		if len(p.getPalabra()) > maximo:
 			maximo=len(p.getPalabra())
+	
+	# Realizo una lista de definiciones, de manera tal de poder volcarlas a una variable de tipo string "definiciones"
+	# La variable "definiciones", será enviada al multiline si el usuario elige opción "Ayuda Mínima"
+	# La variable "CadenaArmada", también de tipo string, sólo se usa para darle un formato de presentación a cada definición
+	# Cada definicón confeccionada con la variable "cadenaArmada" es agregada a la lista "lista_defini"
+	# Una vez configurada la lista "lista_defini", se hace la conversión a string en la variable "definiciones"
+		
+	listaDef = []
+	
+	for clave, valor in diccioDef.items():
+		listaDef.append(valor)
+		
+	definiciones = ''
+	
+	lista_defini = []
+	
+	num = 1
+	for i in listaDef:
+		cadenaArmada = ''
+		cadenaArmada = '- - - - DEFINICIÓN  ' + str(num) + ' - - - -'
+		cadenaArmada = cadenaArmada + '\n' + '\n'
+		cadenaArmada = cadenaArmada + i
+		cadenaArmada = cadenaArmada + '\n'
+		lista_defini.append(cadenaArmada)
+		num = num + 1
+	
+	definiciones = '\n \n'.join(lista_defini)
 		
 	nxn=(len(lista))+maximo
 	matriz_control = crear_matriz(nxn)
@@ -532,7 +572,7 @@ def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop):
 						[sg.T('Cantidad adjetivos:'), sg.T(diccionario['adjetivo'])],
 						[sg.T('Cantidad sustantivos:'), sg.T(diccionario['sustantivo'])],
 						[sg.T('Definiciones de las palabras')],
-						[sg.Multiline(diccioDef.values())]
+						[sg.Multiline(definiciones)]
 					]
 	elif ayuda=='Sin ayuda':
 		palabras = [	[sg.T('Total de palabras:'),sg.T(len(lista))],  
@@ -543,7 +583,7 @@ def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop):
 	diseño=[
 		[sg.Frame('PALABRAS A BUSCAR', palabras),(sg.Column(co))],
 		[sg.Graph(canvas_size=(400,400),graph_bottom_left=(0,largo),graph_top_right=(largo,0),background_color=colorSop, key='graph',change_submits=True, drag_submits=False)],
-        [sg.ReadButton("Listo"), sg.ReadButton("Terminar")]
+        [sg.ReadButton("Listo")]
 		]
 
 	window = sg.Window("grafico", resizable=True).Layout(diseño)
