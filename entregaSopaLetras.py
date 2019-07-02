@@ -1,5 +1,6 @@
 ###### SEGUIR EN CONFIGURARYA######
 #COMIENZA LA CREACION DEL OBJETO
+# Hola chicos
 
 import PySimpleGUI as sg
 from pattern.web import Wiktionary
