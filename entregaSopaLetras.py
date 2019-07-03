@@ -1,7 +1,3 @@
-###### SEGUIR EN CONFIGURARYA######
-#COMIENZA LA CREACION DEL OBJETO
-# Hola chicos
-
 import PySimpleGUI as sg
 from pattern.web import Wiktionary
 import random
@@ -131,7 +127,6 @@ class Palabra:
 		else: cadena="problema_wik"		
 		defini=""	
 		if esClasificado:
-			
 			# ******* A CONTINUACIÓN EN EL "TRY" *******
 			# a[0].content es un string que contiene el título de Etimología + un espacio en blanco + definición de la palabra
 			# Convierto en lista el string anterior para filtrar, en una nueva lista, el título de Etimología + el espacio en blanco
@@ -362,12 +357,7 @@ def completar_matriz(mtx,n,m):
 	for i in range(n):
 		for e in range(n):
 			if mtx[i][e] == "":
-				if m == 'Minúscula':
-					mtx[i][e] = random.choice(string.ascii_lowercase)
-				else:
-					if m == 'Mayúscula':
-						mtx[i][e] = random.choice(string.ascii_uppercase)
-				
+				mtx[i][e] = random.choice(string.ascii_lowercase) if m  else random.choice(string.ascii_uppercase)
 	return mtx
 
 def crear_matriz(nxn):
@@ -410,45 +400,37 @@ def colocar_palabra(matrix,palabra,tipo,esfila,pos,inicio,dictio):
 			matrix[x][pos] = palabra[x-inicio]
 			lista.append((pos,x))		
 	dictio[tipo][palabra]=lista	
-	print ('cacho',dictio)	
-	diccionario_resultado = {}
-	diccionario_resultado['matriz'] = matrix
-	diccionario_resultado['dictio'] = dictio
-	return diccionario_resultado
+	
+	return matrix
 
 def procesar_palabras(matriz,nxn,palabras,orient,dictio,m):
 	posiciones=[]
+	#cambiar direccion , m (AMBOS TIENEN QUE SER BOOLEANOS))
 	for i in range(len(palabras)):
 		posicion_inicial= random.randint(0,nxn-1)
 		posicion= posicion_inicial
-		direccion=orient
+		#direccion= orient
 		colocada=False
 		while(not colocada):
-			valores_en_posicion = valores_posicion(matriz, nxn,direccion,posicion)
+			valores_en_posicion = valores_posicion(matriz, nxn,orient,posicion)
 			for e in range(len(valores_en_posicion)//2):
 				if((valores_en_posicion[e*2]) >= len(palabras[i].getPalabra())):
 					margen= int(valores_en_posicion[e*2] - len(palabras[i].getPalabra()))
 					if margen > 0:
-						inicio= random.randint(0,margen)
-						if m == 'Minúscula':
-							dic = colocar_palabra(matriz, palabras[i].getPalabra().lower(),palabras[i].esTipo(), direccion, posicion, inicio, dictio)
-						if m == 'Mayúscula':
-							dic = colocar_palabra(matriz, palabras[i].getPalabra().upper(),palabras[i].esTipo(), direccion, posicion, inicio, dictio)
+						inicio= random.randint(0,margen)		
+						matriz = colocar_palabra(matriz, palabras[i].getPalabra().lower() if m else palabras[i].getPalabra().upper(),palabras[i].esTipo(), orient, posicion, inicio, dictio)
 					else:
-						if m == 'Minúscula':
-							dic = colocar_palabra(matriz, palabras[i].getPalabra().lower(),palabras[i].esTipo(), direccion, posicion, margen, dictio)
-						if m == 'Mayúscula':
-							dic = colocar_palabra(matriz, palabras[i].getPalabra().upper(),palabras[i].esTipo(), direccion, posicion, margen, dictio)
+						matriz = colocar_palabra(matriz,palabras[i].getPalabra().lower() if m else palabras[i].getPalabra().upper(),palabras[i].esTipo(), orient, posicion, margen, dictio)
 					colocada=True	
 					break
 			if not colocada:
 				if posicion < nxn-1: posicion += 1
 				else: posicion = 0
 	 
-	return dic					
+	return matriz
 
 
-def resultado(ori, ayuda, m, errores):
+def resultado( errores):
 	cadena = ''
 	if len(errores) > 0:
 		cadena = '\n \n'.join(errores)
@@ -460,9 +442,6 @@ def resultado(ori, ayuda, m, errores):
 		
 		[sg.Text('Observaciones')],
 		[sg.Multiline(cadena, size=(50,20))],
-		[sg.Text('La orientacion es:'), sg.Text(ori)],
-		[sg.Text('Tipo de ayuda:'), sg.Text(ayuda)],
-		[sg.Text('Letras en:'), sg.Text(m)],
 		[sg.Submit("Volver")]
 		
 		]
@@ -475,23 +454,26 @@ def resultado(ori, ayuda, m, errores):
 	
 	
 
-
+def completarAyuda(cantLista,cantSust,cantAdj,cantVerbo,lisNue,ayuda):
+	diseño= [	[sg.T('Total de palabras:'),sg.T(cantLista)],  
+				[sg.T('Cantidad verbos:'), sg.T(cantVerbo)],
+				[sg.T('Cantidad adjetivos:'), sg.T(cantAdj)],
+				[sg.T('Cantidad sustantivos:'), sg.T(cantSust)]
+			]
+	if ayuda=='Ayuda máxima':
+		diseño.append([sg.T('Lista de palabras: '), sg.T(lisNue)])
+	elif ayuda =='Ayuda mínima':
+		diseño.append([sg.Button('Definiciones')])
+	return diseño
 
 
 
 
 def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop):
 	encontradas = []
-	if orientacion == True:
-		ori = 'Horizontal'
-	else:
-		ori = 'Vertical'
-	if mayusMinu == True:
-		m = 'Minúscula'
-	else:
-		m = 'Mayúscula'
 	
 	dictioDeClicksDePalabras={"sustantivo":[],"adjetivo":[],"verbo":[]}
+	
 	dictioPalabrasAbuscar={"sustantivo":{},"adjetivo":{},"verbo":{}}
 	maximo=0
 
@@ -534,7 +516,7 @@ def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop):
 	nxn=(len(lista))+maximo
 	matriz_control = crear_matriz(nxn)
 	matriz=crear_matriz(nxn)
-	dic= procesar_palabras(matriz,nxn,lista,orientacion,dictioPalabrasAbuscar,m)
+	matriz= procesar_palabras(matriz,nxn,lista,orientacion,dictioPalabrasAbuscar,mayusMinu)
 	
 	#Creo lista de las palabras buscadas para la "AYUDA"
 	lisNue=[]
@@ -542,45 +524,20 @@ def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop):
 		for clave, valor2 in valor.items():
 			lisNue.append(clave)
 	#fin de tratamiento de las palabras. Se usa en "AYUDA"
-	
-	dicci=dic['dictio']
-	matriz= dic['matriz']
-	
-	## despues es todo lo mismo que hice en el archivo sopaEnd.py		
-	matriz = completar_matriz(matriz, nxn, m)
+	#*******MIRAR DONDE INFLUYE****
+	#****DICCI= dictioPalabrasAbuscar y matriz es matriz
+	#dicci=dic['dictio']
+	#matriz= dic['matriz']
+		
+	matriz = completar_matriz(matriz, nxn, mayusMinu)
 	largo= BOX_SIZE*nxn
 	
-	co = [
-	          [sg.Text('La orientacion es:'), sg.Text(ori)],
-		      [sg.Text('Tipo de ayuda:'), sg.Text(ayuda)],
-		      [sg.Text('Letras en:'), sg.Text(m)],
-		      [sg.Text(' ')],
-		      [sg.ReadButton("Sustantivo",button_color=('white',colores["sustantivo"]),key="Sustantivo"),sg.ReadButton("Adjetivo",button_color=("white",colores["adjetivo"]),key="Adjetivo"),sg.ReadButton("Verbo",button_color=("white",colores["verbo"]),key="Verbo")]   
-	    
-	          ]
+	co = [ 
+		[sg.ReadButton("Sustantivo",button_color=('white',colores["sustantivo"]),key="Sustantivo"),sg.ReadButton("Adjetivo",button_color=("white",colores["adjetivo"]),key="Adjetivo"),sg.ReadButton("Verbo",button_color=("white",colores["verbo"]),key="Verbo")] 
+	     ]
 	
-	
-	if ayuda=='Ayuda máxima':
-		palabras = [	[sg.T('Total de palabras:'),sg.T(len(lista))],  
-						[sg.T('Cantidad verbos:'), sg.T(diccionario['verbo'])],
-						[sg.T('Cantidad adjetivos:'), sg.T(diccionario['adjetivo'])],
-						[sg.T('Cantidad sustantivos:'), sg.T(diccionario['sustantivo'])],
-						[sg.T('Lista de palabras: '), sg.T(lisNue)]
-					]
-	elif ayuda=='Ayuda mínima':
-		palabras = [	[sg.T('Total de palabras:'),sg.T(len(lista))],  
-						[sg.T('Cantidad verbos:'), sg.T(diccionario['verbo'])],
-						[sg.T('Cantidad adjetivos:'), sg.T(diccionario['adjetivo'])],
-						[sg.T('Cantidad sustantivos:'), sg.T(diccionario['sustantivo'])],
-						[sg.T('Definiciones de las palabras')],
-						[sg.Multiline(definiciones)]
-					]
-	elif ayuda=='Sin ayuda':
-		palabras = [	[sg.T('Total de palabras:'),sg.T(len(lista))],  
-						[sg.T('Cantidad verbos:'), sg.T(diccionario['verbo'])],
-						[sg.T('Cantidad adjetivos:'), sg.T(diccionario['adjetivo'])],
-						[sg.T('Cantidad sustantivos:'), sg.T(diccionario['sustantivo'])],
-					]
+	#hacer funcion esto 
+	palabras=completarAyuda(len(lista),len(dictioPalabrasAbuscar["sustantivo"]),len(dictioDeClicksDePalabras["adjetivo"]),len(dictioPalabrasAbuscar["verbo"]),lisNue,ayuda)
 	diseño=[
 		[sg.Frame('PALABRAS A BUSCAR', palabras),(sg.Column(co))],
 		[sg.Graph(canvas_size=(400,400),graph_bottom_left=(0,largo),graph_top_right=(largo,0),background_color=colorSop, key='graph',change_submits=True, drag_submits=False)],
@@ -593,15 +550,13 @@ def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop):
 	mostrar(matriz,nxn,grafico)
 	color_predeterminado=colorSop
 	color=color_predeterminado
-	#hasta aca revise
 
 	#UTILIZO LA VARIABLE "QUE_SOY" PARA QUE CUANDO ESTA LA INTERFAZ DE LA SOPA NO PINTE NI HAGA NADA , UNA VEZ QUE PRESIONO LOS BOTONES "SUSTANTIVO","ADJETIVO" , "VERBO" AHI PUEDE ARRANCAR A BUSCAR
 	que_soy=""
 
 	#loop
 	while True:
-		
-		button, values = window.Read()
+		button,values = window.Read()
 		if button is None:
 			break
 		if button is "Terminar":
@@ -618,6 +573,10 @@ def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop):
 		if button=="Verbo":
 			que_soy=button 
 			color=colores["verbo"]
+		if button=="Definiciones":
+			nuevo=[[sg.Multiline(definiciones,size=(30,20))]]	
+			w=sg.Window("Definiciones").Layout(nuevo)
+			w.Read()
 		if button == 'graph':
 			if mouse == (None, None):
 					continue
@@ -634,26 +593,23 @@ def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop):
 					grafico.DrawRectangle((box_x*BOX_SIZE,box_y*BOX_SIZE),(box_x * BOX_SIZE + BOX_SIZE  , box_y * BOX_SIZE + BOX_SIZE),fill_color=color_predeterminado)
 					dictioDeClicksDePalabras[que_soy.lower()].remove((box_x,box_y))
 					matriz_control[box_x][box_y] = color_predeterminado
-					if m == 'Minúscula':
-						grafico.DrawText(str(matriz[box_y][box_x]).lower(),(box_x*BOX_SIZE+18,box_y*BOX_SIZE+14),font='Courier 25')
-					if m == 'Mayúscula':
-						grafico.DrawText(str(matriz[box_y][box_x]).upper(),(box_x*BOX_SIZE+18,box_y*BOX_SIZE+14),font='Courier 25')	
+					# arregar
+					grafico.DrawText(str(matriz[box_y][box_x]).lower() if mayusMinu else str(matriz[box_y][box_x]).upper(),(box_x*BOX_SIZE+18,box_y*BOX_SIZE+14),font='Courier 25')
+		
 				else:
 					dictioDeClicksDePalabras[que_soy.lower()].append((box_x,box_y))
 					grafico.DrawRectangle((box_x*BOX_SIZE,box_y*BOX_SIZE),(box_x * BOX_SIZE + BOX_SIZE  , box_y * BOX_SIZE + BOX_SIZE),fill_color=color)
 					matriz_control[box_x][box_y] = color
-					if m == 'Minúscula':
-						grafico.DrawText(str(matriz[box_y][box_x]).lower(),(box_x*BOX_SIZE+18,box_y*BOX_SIZE+14),font='Courier 25')
-					if m == 'Mayúscula':
-						grafico.DrawText(str(matriz[box_y][box_x]).upper(),(box_x*BOX_SIZE+18,box_y*BOX_SIZE+14),font='Courier 25')	
+					grafico.DrawText(str(matriz[box_y][box_x]).lower() if mayusMinu else str(matriz[box_y][box_x]).upper(),(box_x*BOX_SIZE+18,box_y*BOX_SIZE+14),font='Courier 25')
+		
 		
 					
 		if button is 'Listo':
 			errores = []
 			no_encontradas = []
 			
-			for clave in dicci.keys():
-				for nombre_palabra, elemento in dicci[clave].items():
+			for clave in dictioPalabrasAbuscar.keys():
+				for nombre_palabra, elemento in dictioPalabrasAbuscar[clave].items():
 					cantidad = 0
 					cant_coloridos = 0
 					col = ''
@@ -688,7 +644,10 @@ def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop):
 				texto = 'Hay más palabras por encontrar:'
 				errores.append(texto)
 					
-			resultado(ori, ayuda, m, errores)
+			resultado(errores)
+			if len(errores) == 0:
+				break
+	window.Close()				
 			
 			
 		
