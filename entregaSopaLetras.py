@@ -327,7 +327,6 @@ def configurarYa():
 	window.Close()	
 
 	
-	
 	return palabrasXtipo,cantidadXtipo,orientacion,ayuda,mayusMinu,colores,color	
 
 #/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -430,28 +429,57 @@ def procesar_palabras(matriz,nxn,palabras,orient,dictio,m):
 	return matriz
 
 
-def resultado( errores):
+def resultado(errores,lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop, diccioTodasPalabras, ok):
 	cadena = ''
-	if len(errores) > 0:
-		cadena = '\n \n'.join(errores)
-	elif len(errores) == 0:
-		cadena = 'FELICITACIONES. GANASTE EL JUEGO'
+    #Linea Nueva. Esta lista es para cuando quiera volver a hacer la eleccion de palabras aleatorias. Ver linea 474	
+	lnue=[]
 	
+    #Parte borrada, no necesaria
+#	if len(errores) > 0:
+#		cadena = '\n \n'.join(errores)
+#	elif len(errores) == 0:
+#		cadena = 'FELICITACIONES. GANASTE EL JUEGO'
+	if (ok==False):
+		cadena = '\n \n'.join(errores)
+	if (ok==True):
+		cadena = 'FELICITACIONES. GANASTE EL JUEGO' 
 	
 	diseño=[
 		
 		[sg.Text('Observaciones')],
 		[sg.Multiline(cadena, size=(50,20))],
-		[sg.Submit("Volver")]
+		[sg.Submit("Reiniciar Juego con las mismas palabras")],
+		[sg.Submit("Reiniciar con otras palabras Manteniendo el Ajuste")],
+		[sg.Submit("Volver a Ajustes")],
+		[sg.Submit("No quiero jugar mas")]
+		
 		
 		]
 	
 	
 	window = sg.Window("grafico", resizable=True).Layout(diseño)
-	window.Finalize()
-	button,values=window.Read()
-	window.Close()
+#	window.Finalize()
 	
+	while True:
+		button,values=window.Read()
+		if button is None:
+			break
+		if button == "No quiero jugar mas":
+			window.Close()
+			sys.exit(0)
+		#permito reiniciar el juego con el mismo ajuste y las mismas palabras
+		if button=="Reiniciar Juego con las mismas palabras":
+			window.Close()
+			juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop, diccioTodasPalabras)
+		#permito reiniciar el juego con el mismo ajuste y otras palabras aleatorias
+		if button=="Reiniciar con otras palabras Manteniendo el Ajuste":
+			window.Close()
+			lnue = calcularCantidadIngresadas(diccionario, diccioTodasPalabras)
+			juego_nuevo(lnue, orientacion, ayuda, colores, mayusMinu, diccionario, colorSop, diccioTodasPalabras)
+		#permito reiniciar desde cero	
+		if button=="Volver a Ajustes":
+			window.Close()
+			comenzar()	
 	
 
 def completarAyuda(cantLista,cantSust,cantAdj,cantVerbo,lisNue,ayuda):
@@ -467,9 +495,7 @@ def completarAyuda(cantLista,cantSust,cantAdj,cantVerbo,lisNue,ayuda):
 	return diseño
 
 
-
-
-def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop):
+def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop, diccioTodasPalabras):
 	encontradas = []
 	
 	dictioDeClicksDePalabras={"sustantivo":[],"adjetivo":[],"verbo":[]}
@@ -535,9 +561,9 @@ def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop):
 	co = [ 
 		[sg.ReadButton("Sustantivo",button_color=('white',colores["sustantivo"]),key="Sustantivo"),sg.ReadButton("Adjetivo",button_color=("white",colores["adjetivo"]),key="Adjetivo"),sg.ReadButton("Verbo",button_color=("white",colores["verbo"]),key="Verbo")] 
 	     ]
-	
-	#hacer funcion esto 
-	palabras=completarAyuda(len(lista),len(dictioPalabrasAbuscar["sustantivo"]),len(dictioDeClicksDePalabras["adjetivo"]),len(dictioPalabrasAbuscar["verbo"]),lisNue,ayuda)
+
+	#Se soluciono un error que habia en la linea siguiente. El adjetivo siempre marcaba 0. Habia solo un error de nombre de diccionario en parametro 3 
+	palabras=completarAyuda(len(lista),len(dictioPalabrasAbuscar["sustantivo"]),len(dictioPalabrasAbuscar["adjetivo"]),len(dictioPalabrasAbuscar["verbo"]),lisNue,ayuda)
 	diseño=[
 		[sg.Frame('PALABRAS A BUSCAR', palabras),(sg.Column(co))],
 		[sg.Graph(canvas_size=(400,400),graph_bottom_left=(0,largo),graph_top_right=(largo,0),background_color=colorSop, key='graph',change_submits=True, drag_submits=False)],
@@ -553,14 +579,15 @@ def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop):
 
 	#UTILIZO LA VARIABLE "QUE_SOY" PARA QUE CUANDO ESTA LA INTERFAZ DE LA SOPA NO PINTE NI HAGA NADA , UNA VEZ QUE PRESIONO LOS BOTONES "SUSTANTIVO","ADJETIVO" , "VERBO" AHI PUEDE ARRANCAR A BUSCAR
 	que_soy=""
-
+	
+	#Linea Nueva. Si el OK se mantiene en TRUE sera que el juego fue ganado sin errores
+	ok = True
+    
 	#loop
 	while True:
 		button,values = window.Read()
 		if button is None:
 			break
-		if button is "Terminar":
-			sys.exit(69)
 		mouse = values['graph']
 		mouse= values['graph']
 		# ESTOS 3 IF HACEN QUE CUANDO CAMBIE DE BOTON EL QUE SOY SE MODIFIQUE Y EL COLOR TAMBIEN
@@ -589,13 +616,14 @@ def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop):
 				#UTILIZO LA VARIBLE QUE_SOY PARA HACER USO DE LOS DICCIONARIOS 
 				#QUE_SOY.LOWER() SE PUEDE CAMBIAR YA QUE PUSE EL BOTON COMO "Sustantivo" Y EN EL DICCIONARIO ESTA COMO "sustantivo" (no es de mucha importancia)
 				chequearSiPisa(que_soy.lower(),(box_x,box_y),dictioDeClicksDePalabras)
+				#probando
 				if (box_x,box_y)in dictioDeClicksDePalabras[que_soy.lower()]:
 					grafico.DrawRectangle((box_x*BOX_SIZE,box_y*BOX_SIZE),(box_x * BOX_SIZE + BOX_SIZE  , box_y * BOX_SIZE + BOX_SIZE),fill_color=color_predeterminado)
 					dictioDeClicksDePalabras[que_soy.lower()].remove((box_x,box_y))
 					matriz_control[box_x][box_y] = color_predeterminado
 					# arregar
 					grafico.DrawText(str(matriz[box_y][box_x]).lower() if mayusMinu else str(matriz[box_y][box_x]).upper(),(box_x*BOX_SIZE+18,box_y*BOX_SIZE+14),font='Courier 25')
-		
+		            
 				else:
 					dictioDeClicksDePalabras[que_soy.lower()].append((box_x,box_y))
 					grafico.DrawRectangle((box_x*BOX_SIZE,box_y*BOX_SIZE),(box_x * BOX_SIZE + BOX_SIZE  , box_y * BOX_SIZE + BOX_SIZE),fill_color=color)
@@ -605,6 +633,7 @@ def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop):
 		
 					
 		if button is 'Listo':
+			window.Close()
 			errores = []
 			no_encontradas = []
 			
@@ -629,7 +658,10 @@ def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop):
 								t = tipo
 						if (t != ''):
 							errores.append('La palabra ' + nombre_palabra + ' es ' + clave + '. Erróneamente fue sombreada como ' + t)
-
+							#Linea Nueva, el OK se pondra en False porque el juego estuvo incompleto o mal echo
+							ok=False
+							#Linea nueva, por mas que le erre al tipo, la palabra fue encontrada, por lo tanto la agrego igual a la lista de encontradas
+							encontradas.append(nombre_palabra)
 			
 			if len(encontradas) < len(lista):
 				for i in lista:
@@ -641,20 +673,30 @@ def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop):
 						no_encontradas.append(i)
 			
 			if len(no_encontradas) > 0:
-				texto = 'Hay más palabras por encontrar:'
+				#Linea Nueva, el ok se pone en FALSE dado que falton paralabras
+				ok=False
+				texto = 'Faltaron encontrar palabras. La lista total de palabras que debias encontrar son: '
+				texto = texto + ' - '.join(lisNue)
 				errores.append(texto)
+			else: #Linea nueva, indica que las palabras se encontraron todas, acertando o no el tipo. Se vera si en le acerto al tipo indicado en las "Observaciones"
+				texto = 'Has encontrado todas las palabras en la sopa'
+				errores.append(texto)
+						
+			#Linea Nueva, se envia el OK al modulo resultado para la devolucion. Ok=True (Juego Ganado sin Problemas), OK=False (Juego con observaciones)
+			resultado(errores,lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop, diccioTodasPalabras, ok)
+            
+            #Esto lo saco dado que errores nunca va a ser 0. Porque para el caso que se encuentren todas las palabras, la funcion "errores" va a contener eso la 
+#			if len(errores) == 0:
+#				break
 					
-			resultado(errores)
-			if len(errores) == 0:
-				break
-	window.Close()				
 			
 			
 		
 def comenzar():
 	palabrasXtipo,cantidadXtipo,orientacion,ayuda,mayusMinu,colores,colorSop=configurarYa()		
 	lista=calcularCantidadIngresadas(cantidadXtipo,palabrasXtipo)
-	juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,cantidadXtipo,colorSop)
+	#igual que antes pero paso ademas al modulo "palabrasXtipo" (diccionario con clave "tipo" y valor "lista" de todas las palabras) para poder reiniciar las palabras manteniendo el ajuste
+	juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,cantidadXtipo,colorSop, palabrasXtipo)
 
 
 comenzar()
