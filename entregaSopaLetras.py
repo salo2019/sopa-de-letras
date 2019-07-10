@@ -32,10 +32,23 @@ def calcularCantidadIngresadas(cXtipo,pXtipo):
 
 def repetido(palabra,dicio):
 	#palabra es un objeto
-	lista=list(map(lambda x: x.getPalabra(),dicio[palabra.esTipo()]))
-	if palabra.getPalabra() in lista:
-		return False
-	else: return True
+	#si "sePuede" es verdadero, la palabra se podrá agregar
+	
+	sePuede = True
+	tipo = ''
+	
+	#chequea en todo el diccionario si la palabra ya se encuentra agregada
+	for clave, valor in dicio.items():
+		lista = []
+		lista=list(map(lambda x: x.getPalabra(),dicio[clave]))
+		if palabra.getPalabra() in lista:
+			sePuede = False
+			tipo = clave
+	
+	# Devuelve una tupla, donde el primer elemento ("sePuede"), si es "True", indica si se puede agregar la palabra. Caso conrario, 
+	# el segundo devuelve el tipo al que pertenece la palabra que no puede ser agregada
+	
+	return (sePuede, tipo)
 
 class Palabra:
 	def reporte(self,p,quien):
@@ -63,7 +76,7 @@ class Palabra:
 				diseñoo=[
 						[sg.Text("Ingrese una Definicion "),sg.InputText(key="definicion")],
 						[sg.Text("Tipo"),sg.Radio('Sustantivo','tipo',key="sustantivo"),sg.Radio('Adjetivo','tipo',key="adjetivo"),sg.Radio('Verbo','tipo',key="verbo")],
-						[sg.Submit("Agregar")]
+						[sg.Submit("Agregar"), sg.Submit("Cancelar")]
 						]
 				window=sg.Window("Definicion").Layout(diseñoo)		
 				while True:
@@ -79,14 +92,21 @@ class Palabra:
 						elif valores["verbo"]:
 							tipo="verbo"	
 						break
-				
+						
+					if boton == "Cancelar":
+						tipo = "sinTipo"
+						valores["definicion"] = "sinDefinicion"
+						break
+						
+				#se cierra la ventana. Si presiona "Cancelar", la ventana se cierra y los valores son iguales a None
+				window.Close()
 				
 				return tipo,valores["definicion"]
 			else:
 				diseñoo=[
 						[sg.Text("Ingrese una Definicion de ",str(p)),sg.InputText(key="definicion")],
 						[sg.Text("Tipo"),sg.Radio('Sustantivo','tipo',key="sustantivo"),sg.Radio('Adjetivo','tipo',key="adjetivo"),sg.Radio('Verbo','tipo',key="verbo")],
-						[sg.Submit("Agregar")]
+						[sg.Submit("Agregar"), sg.Submit("Cancelar")]
 						]
 				window=sg.Window("Definicion").Layout(diseñoo)		
 				while True:
@@ -102,6 +122,15 @@ class Palabra:
 						elif valores["verbo"]:
 							tipo="verbo"	
 						break
+						
+					if boton == "Cancelar":
+						tipo = "sinTipo"
+						valores["definicion"] = "sinDefinicion"
+						break
+						
+				#se cierra ventana. Si presiona "Cancelar", la ventana se cierra y los valores son iguales a None
+				window.Close()
+				
 				return tipo,valores["definicion"]			
 
 	def verificar_wiktionary(self,palabra):
@@ -238,7 +267,7 @@ def configurarYa():
 	#Armo el diseño de la interface
 	diseño = [  [sg.Frame('Seleccion de colores', frame_layout)],
 				[sg.Text('Ingreso de palabra'), sg.InputText(key="palabra")],
-				[sg.Text("",size=(30,1),key="out1",text_color="red")],
+				[sg.Text("",size=(60,1),key="out1",text_color="red")],
 				[sg.Submit('Aceptar')],				
 				[sg.Column(columna_1), sg.Column(columna_2), sg.Column(columna_3)],
 				#cantidad a mostrar
@@ -268,14 +297,22 @@ def configurarYa():
 				if not palabra.isalpha():
 					window.FindElement("out1").Update("{} no es una palabra".format(str(palabra)))
 				else:
-					p= Palabra(palabra)
+					#en la siguiente línea, todos los caracteres son convertidos en minúsculas y se crea el objeto Palabra
+					p = Palabra(palabra.lower())
 					#tener en cuenta si no tiene clasificacion 
 					#como uso multiline me debo fijar como agregar esta palabra
-					if repetido(p,palabrasXtipo):
-						palabrasXtipo[p.esTipo()].append(p)
-						window.FindElement(p.esTipo()).Update(value=str(p.getPalabra()+" "),append=True)
+					
+					#chequea si se cancelaron los ingresos manuales de tipo y definición de la palabra
+					if p.getDefinicion() == "sinDefinicion":
+						window.FindElement("out1").Update("El ingreso de la palabra '{}' fue cancelado".format(str(palabra)))
+						
 					else:
-						window.FindElement("out1").Update("{} ya esta en la lista de {}".format(str(palabra),str(p.esTipo())))	
+						tuplaVerificacion = repetido(p, palabrasXtipo)
+						if tuplaVerificacion[0]:
+							palabrasXtipo[p.esTipo()].append(p)
+							window.FindElement(p.esTipo()).Update(value=str(p.getPalabra()+" "),append=True)
+						else:
+							window.FindElement("out1").Update("La palabra '{}' fue agregada anteriormente como {}".format(str(palabra.lower()), tuplaVerificacion[1]))	
 					
 			else: window.FindElement("out1").Update("Ingrese una palabra")
 		if boton=="Terminar":
@@ -293,10 +330,32 @@ def configurarYa():
 			else:
 				window.FindElement("ver").Update('<INGRESE UN NUMERO>')
 				continue
+				
+			#chequea que los colores no estén repetidos
+			if valores['ColSust'] == valores['ColAdj']:
+				sg.Popup('ERROR', 'Los colores para sustantivos y adjetivos deben ser distintos. Vuelva a elegirlos')
+				window.FindElement("ColSust").Update('')
+				window.FindElement("ColAdj").Update('')
+				continue
+			elif valores['ColSust'] == valores['ColVer']:
+				sg.Popup('ERROR', 'Los colores para sustantivos y verbos deben ser distintos. Vuelva a elegirlos')
+				window.FindElement("ColSust").Update('')
+				window.FindElement("ColVer").Update('')
+				continue
+			elif valores['ColAdj'] == valores['ColVer']:
+				sg.Popup('ERROR', 'Los colores para adjetivos y verbos deben ser distintos. Vuelva a elegirlos')
+				window.FindElement("ColAdj").Update('')
+				window.FindElement("ColVer").Update('')
+				continue
+				
 			break		
+	
+	
 	colores['sustantivo']=valores['ColSust']
 	colores['adjetivo']=valores['ColAdj']
-	colores['verbo']=valores['ColVer']		
+	colores['verbo']=valores['ColVer']
+	
+			
 	if valores["h"] == True:
 		orientacion=True
 	elif valores["v"] == True:
@@ -431,10 +490,10 @@ def procesar_palabras(matriz,nxn,palabras,orient,dictio,m):
 
 def resultado(errores,lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop, diccioTodasPalabras, ok):
 	cadena = ''
-    #Linea Nueva. Esta lista es para cuando quiera volver a hacer la eleccion de palabras aleatorias. Ver linea 474	
+	#Linea Nueva. Esta lista es para cuando quiera volver a hacer la eleccion de palabras aleatorias. Ver linea 474	
 	lnue=[]
 	
-    #Parte borrada, no necesaria
+	#Parte borrada, no necesaria
 #	if len(errores) > 0:
 #		cadena = '\n \n'.join(errores)
 #	elif len(errores) == 0:
@@ -560,14 +619,14 @@ def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop, 
 	
 	co = [ 
 		[sg.ReadButton("Sustantivo",button_color=('white',colores["sustantivo"]),key="Sustantivo"),sg.ReadButton("Adjetivo",button_color=("white",colores["adjetivo"]),key="Adjetivo"),sg.ReadButton("Verbo",button_color=("white",colores["verbo"]),key="Verbo")] 
-	     ]
+		 ]
 
 	#Se soluciono un error que habia en la linea siguiente. El adjetivo siempre marcaba 0. Habia solo un error de nombre de diccionario en parametro 3 
 	palabras=completarAyuda(len(lista),len(dictioPalabrasAbuscar["sustantivo"]),len(dictioPalabrasAbuscar["adjetivo"]),len(dictioPalabrasAbuscar["verbo"]),lisNue,ayuda)
 	diseño=[
 		[sg.Frame('PALABRAS A BUSCAR', palabras),(sg.Column(co))],
 		[sg.Graph(canvas_size=(400,400),graph_bottom_left=(0,largo),graph_top_right=(largo,0),background_color=colorSop, key='graph',change_submits=True, drag_submits=False)],
-        [sg.ReadButton("Listo")]
+		[sg.ReadButton("Listo")]
 		]
 
 	window = sg.Window("grafico", resizable=True).Layout(diseño)
@@ -582,7 +641,7 @@ def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop, 
 	
 	#Linea Nueva. Si el OK se mantiene en TRUE sera que el juego fue ganado sin errores
 	ok = True
-    
+	
 	#loop
 	while True:
 		button,values = window.Read()
@@ -623,7 +682,7 @@ def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop, 
 					matriz_control[box_x][box_y] = color_predeterminado
 					# arregar
 					grafico.DrawText(str(matriz[box_y][box_x]).lower() if mayusMinu else str(matriz[box_y][box_x]).upper(),(box_x*BOX_SIZE+18,box_y*BOX_SIZE+14),font='Courier 25')
-		            
+					
 				else:
 					dictioDeClicksDePalabras[que_soy.lower()].append((box_x,box_y))
 					grafico.DrawRectangle((box_x*BOX_SIZE,box_y*BOX_SIZE),(box_x * BOX_SIZE + BOX_SIZE  , box_y * BOX_SIZE + BOX_SIZE),fill_color=color)
@@ -684,8 +743,8 @@ def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop, 
 						
 			#Linea Nueva, se envia el OK al modulo resultado para la devolucion. Ok=True (Juego Ganado sin Problemas), OK=False (Juego con observaciones)
 			resultado(errores,lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop, diccioTodasPalabras, ok)
-            
-            #Esto lo saco dado que errores nunca va a ser 0. Porque para el caso que se encuentren todas las palabras, la funcion "errores" va a contener eso la 
+			
+			#Esto lo saco dado que errores nunca va a ser 0. Porque para el caso que se encuentren todas las palabras, la funcion "errores" va a contener eso la 
 #			if len(errores) == 0:
 #				break
 					
