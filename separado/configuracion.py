@@ -39,7 +39,11 @@ def repetido(palabra,dicio):
 	# el segundo devuelve el tipo al que pertenece la palabra que no puede ser agregada
 	
 	return (sePuede, tipo)
-
+def hayPalabras(sus,adj,verb):
+	hay=False
+	if (sus>0 or adj>0 or verb>0):
+		hay=True
+	return hay	
 def configurarYa():
 	#calcula las oficinas a mostrar
 	archivo=open("oficinas.txt","r")	
@@ -100,7 +104,7 @@ def configurarYa():
 	while True:
 		boton,valores=window.Read()
 		if boton is None:
-			break
+			sys.exit(0)
 		if boton =="Aceptar":
 			window.FindElement("out1").Update("")
 			if valores["palabra"] !="":
@@ -127,6 +131,9 @@ def configurarYa():
 					
 			else: window.FindElement("out1").Update("Ingrese una palabra")
 		if boton=="Terminar":
+			if not hayPalabras( len(palabrasXtipo["sustantivo"]), len(palabrasXtipo["adjetivo"]),len(palabrasXtipo["verbo"])):
+				window.FindElement("out1").Update('<INGRESE UNA PALABRA>')	
+				continue
 			if valores["sustantivo1"].isdigit():
 				cantidadXtipo["sustantivo"]= int(valores["sustantivo1"])
 			else:

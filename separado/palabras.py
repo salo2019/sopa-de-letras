@@ -35,6 +35,8 @@ class Palabra:
 				while True:
 					boton,valores= window.Read()
 					if boton is None:
+						tipo = "sinTipo"
+						valores["definicion"] = "sinDefinicion"
 						break
 					if boton == "Agregar":
 		
@@ -65,6 +67,8 @@ class Palabra:
 				while True:
 					boton,valores= window.Read()
 					if boton is None:
+						tipo = "sinTipo"
+						valores["definicion"] = "sinDefinicion"
 						break
 					if boton == "Agregar":
 		

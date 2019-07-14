@@ -155,7 +155,7 @@ def resultado(errores,lista,orientacion,ayuda,colores,mayusMinu,diccionario,colo
 	while True:
 		button,values=window.Read()
 		if button is None:
-			break
+			sys.exit(0)
 		if button == "No quiero jugar mas":
 			window.Close()
 			sys.exit(0)
@@ -272,7 +272,7 @@ def completarAyuda(cantLista,cantSust,cantAdj,cantVerbo,lisNue,ayuda):
 				[sg.T('Cantidad sustantivos:'), sg.T(cantSust)]
 			]
 	if ayuda=='Ayuda máxima':
-		diseño.append([sg.T('Lista de palabras: '), sg.T(lisNue)])
+		diseño.append([sg.T('Lista de palabras: '), sg.T(" ".join(lisNue))])
 	elif ayuda =='Ayuda mínima':
 		diseño.append([sg.Button('Definiciones')])
 	return diseño
