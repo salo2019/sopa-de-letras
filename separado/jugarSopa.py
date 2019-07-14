@@ -143,7 +143,7 @@ def resultado(errores,lista,orientacion,ayuda,colores,mayusMinu,diccionario,colo
 		[sg.Submit("Reiniciar Juego con las mismas palabras")],
 		[sg.Submit("Reiniciar con otras palabras Manteniendo el Ajuste")],
 		[sg.Submit("Volver a Ajustes")],
-		[sg.Submit("No quiero jugar mas")]
+		[sg.Button("No quiero jugar mas", button_color = ('white', 'red'))]
 		
 		
 		]
@@ -174,6 +174,15 @@ def resultado(errores,lista,orientacion,ayuda,colores,mayusMinu,diccionario,colo
 			import jugar as game
 # funcion terminar	
 def terminar(dictioPalabrasAbuscar,dictioDeClicksDePalabras,colores,matriz_control,ok,encontradas,lista,lisNue):
+	
+	#linea Nueva.... esto es para contar por si hay clicks de mas	
+	cant = 0
+	cantClicks = 0
+	errorTipo = False
+	errorClick = False
+	#hasta aqui las variables nuevas .......
+	
+	
 	errores = []
 	no_encontradas = []		
 	for clave in dictioPalabrasAbuscar.keys():
@@ -196,11 +205,12 @@ def terminar(dictioPalabrasAbuscar,dictioDeClicksDePalabras,colores,matriz_contr
 					if col == color_sombreado:
 						t = tipo
 				if (t != ''):
-					errores.append('La palabra ' + nombre_palabra + ' es ' + clave + '. Erróneamente fue sombreada como ' + t)
+					errores.append('La palabra ' + nombre_palabra + ' es ' + clave + '. Erróneamente fue coloreada como ' + t)
 					#Linea Nueva, el OK se pondra en False porque el juego estuvo incompleto o mal echo
 					ok=False
+					errorTipo = True
 					#Linea nueva, por mas que le erre al tipo, la palabra fue encontrada, por lo tanto la agrego igual a la lista de encontradas
-					#encontradas.append(nombre_palabra)
+					encontradas.append(nombre_palabra)
 			
 	if len(encontradas) < len(lista):
 		for i in lista:
@@ -211,17 +221,50 @@ def terminar(dictioPalabrasAbuscar,dictioDeClicksDePalabras,colores,matriz_contr
 			if ok == False:
 				no_encontradas.append(i)
 			
-	if len(no_encontradas) > 0:
-		#Linea Nueva, el ok se pone en FALSE dado que falton paralabras
+	
+	
+	#Apartir de esta parte es para verificar si se clickearon letras de mas-----------------------------------
+	#linea Nueva.... Recorro el diccionario de clicks y suma la cantidad de click realizados por el usuario			
+	for claveClik in dictioDeClicksDePalabras.keys():
+		for valor in dictioDeClicksDePalabras[claveClik]:
+			cantClicks = cantClicks + 1
+				
+	#Linea Nueva.... Recorro la lista de palabras y sumo el total de caracteres
+	for p in lista:
+		cant= cant + len(p.getPalabra())
+				
+	#lineas Nuevas.... Si la cantidad de clicks es mayor a la cantidad de caracteres a buscar es porque hubo clicks de mas
+	if cantClicks > cant:
+		texto = 'Atencion!!  Coloreaste ' + str(cantClicks-cant) + ' letras de mas que no iban en la sopa. Vuelva a intentarlo'
+		errores.append(texto)
+		ok = False
+		errorClick = True
+	#hasta aqui..... lo nuevo--------------------------------------------------------------------------------------	
+	
+	#Parte modificada
+	if len(encontradas) < len(lista):
+		#Linea Nueva, el ok se pone en FALSE dado que falton palabras
 		ok=False
 		texto = 'Faltaron encontrar palabras. La lista total de palabras que debias encontrar son: '
 		texto = texto + ' - '.join(lisNue)
 		errores.append(texto)
-	else: #Linea nueva, indica que las palabras se encontraron todas, acertando o no el tipo. Se vera si en le acerto al tipo indicado en las "Observaciones"
-		texto = 'Has encontrado todas las palabras en la sopa'
-		errores.append(texto)
-						
+	elif len(no_encontradas) == 0: #Linea nueva, indica que las palabras se encontraron todas, acertando o no el tipo. Se vera si en le acerto al tipo indicado en las "Observaciones"
+		if errorTipo == True:
+			if errorClick == True:
+				#Si ocurrieron los dos errores informara los dos
+				texto = 'Has encontrado todas las palabras en la sopa, pero coloreaste letras de mas y te equivocaste en los tipos'
+				errores.append(texto)
+			else:
+				#Si solo ocurrio error de tipos
+				texto = 'Has encontrado todas las palabras en la sopa, pero te equivocaste en los tipos'
+				errores.append(texto)
+		elif errorClick == True:
+			#Si solo ocurrio error de letras extras coloreadas
+			texto = 'Has encontrado todas las palabras en la sopa, pero coloreaste letras de mas'
+			errores.append(texto)
+					
 	return errores,ok
+
 def completarAyuda(cantLista,cantSust,cantAdj,cantVerbo,lisNue,ayuda):
 	diseño= [	[sg.T('Total de palabras:'),sg.T(cantLista)],  
 				[sg.T('Cantidad verbos:'), sg.T(cantVerbo)],
@@ -233,6 +276,7 @@ def completarAyuda(cantLista,cantSust,cantAdj,cantVerbo,lisNue,ayuda):
 	elif ayuda =='Ayuda mínima':
 		diseño.append([sg.Button('Definiciones')])
 	return diseño
+
 def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop, diccioTodasPalabras):
 	encontradas = []
 	

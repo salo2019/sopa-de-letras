@@ -1,1 +1,1 @@
-{"wikidictionary": ["atr", "atr", "atr", "atr", "atr", "atr", "atr"], "pattern": ["ahre"]}
+{"wikidictionary": ["atr", "atr", "atr", "atr", "atr", "atr", "atr", "orangutan"], "pattern": ["ahre"]}
