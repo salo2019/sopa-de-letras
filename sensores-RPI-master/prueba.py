@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import time
+import json
 from matriz import Matriz
 from sonido import Sonido
 from temperatura import Temperatura
@@ -16,14 +17,14 @@ matriz = Matriz()
 sonido = Sonido()
 temperatura = Temperatura()
 def guardar_temp(info):
-    with open("oficinas.json"), "r") as log_file:
+    with open(("oficinas.json"), "r") as log_file:
         try:
             lista_de_temperaturas = json.load(log_file)
         except Exception:
             # En caso de que el json no sea una lista
             lista_de_temperaturas = []
     lista_de_temperaturas.append(info)
-    with open("oficinas.json"), "w") as log_fil:
+    with open(("oficinas.json"), "w") as log_fil:
         json.dump(lista_de_temperaturas, log_fil, indent=4)
 
 def acciones():
@@ -34,3 +35,7 @@ def acciones():
     #guardar temp_data en un archivo
     guardar_temp(temp_data)
     matriz.mostrar_mensaje(temp_formateada, delay=0.08, font=2)
+
+while True:
+    time.sleep(0.1)
+    sonido.evento_detectado(acciones)
