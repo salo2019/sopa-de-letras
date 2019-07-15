@@ -74,14 +74,16 @@ class Palabra:
 				#print("# se genera un reporte de mano de wiki")
 				self.reporte(p,"wikidictionary")
 				diseñoo=[
-						[sg.Text("Ingrese una Definicion "),sg.InputText(key="definicion")],
-						[sg.Text("Tipo"),sg.Radio('Sustantivo','tipo',key="sustantivo"),sg.Radio('Adjetivo','tipo',key="adjetivo"),sg.Radio('Verbo','tipo',key="verbo")],
+						[sg.Text("Ingrese una definición"),sg.InputText(key="definicion")],
+						[sg.Text("Tipo"),sg.Radio('Sustantivo','tipo',key="sustantivo", default=True),sg.Radio('Adjetivo','tipo',key="adjetivo"),sg.Radio('Verbo','tipo',key="verbo")],
 						[sg.Submit("Agregar"), sg.Submit("Cancelar")]
 						]
-				window=sg.Window("Definicion").Layout(diseñoo)		
+				window=sg.Window("Definición y Tipo").Layout(diseñoo)		
 				while True:
 					boton,valores= window.Read()
 					if boton is None:
+						tipo = "sinTipo"
+						valores["definicion"] = "sinDefinicion"
 						break
 					if boton == "Agregar":
 		
@@ -90,7 +92,7 @@ class Palabra:
 						elif valores["adjetivo"]:
 							tipo="adjetivo"
 						elif valores["verbo"]:
-							tipo="verbo"	
+							tipo="verbo"
 						break
 						
 					if boton == "Cancelar":
@@ -104,14 +106,16 @@ class Palabra:
 				return tipo,valores["definicion"]
 			else:
 				diseñoo=[
-						[sg.Text("Ingrese una Definicion de ",str(p)),sg.InputText(key="definicion")],
-						[sg.Text("Tipo"),sg.Radio('Sustantivo','tipo',key="sustantivo"),sg.Radio('Adjetivo','tipo',key="adjetivo"),sg.Radio('Verbo','tipo',key="verbo")],
+						[sg.Text("Ingrese una definición de ",str(p)),sg.InputText(key="definicion")],
+						[sg.Text("Tipo"),sg.Radio('Sustantivo','tipo',key="sustantivo", default=True),sg.Radio('Adjetivo','tipo',key="adjetivo"),sg.Radio('Verbo','tipo',key="verbo")],
 						[sg.Submit("Agregar"), sg.Submit("Cancelar")]
 						]
-				window=sg.Window("Definicion").Layout(diseñoo)		
+				window=sg.Window("Definición y Tipo").Layout(diseñoo)		
 				while True:
 					boton,valores= window.Read()
 					if boton is None:
+						tipo = "sinTipo"
+						valores["definicion"] = "sinDefinicion"
 						break
 					if boton == "Agregar":
 		
@@ -120,7 +124,7 @@ class Palabra:
 						elif valores["adjetivo"]:
 							tipo="adjetivo"
 						elif valores["verbo"]:
-							tipo="verbo"	
+							tipo="verbo"
 						break
 						
 					if boton == "Cancelar":
@@ -171,8 +175,30 @@ class Palabra:
 				li = list(filter(lambda x: x != '' and "Etimología" not in x, listaDefinicion))
 				defini = '\n'.join(li)
 			except IndexError:
-				defini = sg.PopupGetText('Ingrese definicion:', 'No existe definicion de la palabra')
+				#Carga sólo definicion, si tiene clasificacion de wiki, pero sin el Popup, sino con una ventana
+				diseñoo=[
+						[sg.Text("Ingrese una definición"),sg.InputText(key="definicion")],
+						[sg.Submit("Agregar"), sg.Submit("Cancelar")]
+						]
+				window=sg.Window("Agregar Definición").Layout(diseñoo)		
+				while True:
+					boton,valores= window.Read()
+					if boton is None:
+						valores["definicion"] = "sinDefinicion"
+						break
+					if boton == "Cancelar":
+						valores["definicion"] = "sinDefinicion"
+						break
+					if boton == "Agregar":
+						defini = valores["definicion"]
+						break
+				
+				defini = valores["definicion"]
+						
+				#se cierra ventana. Si presiona "Cancelar", la ventana se cierra y los valores son iguales a None
+				window.Close()		
 		return [cadena,esClasificado,defini]
+		
 	def verificar_pattern(self,palabra):
 		from pattern.es import tag
 		tipo= tag(palabra)[0][1]
