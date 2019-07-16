@@ -20,6 +20,7 @@ def calcularPromedio(registro):
 	for i in registro:
 		promedio=promedio+i["temp"]
 	return promedio//len(registro)
+
 def repetido(palabra,dicio):
 	#palabra es un objeto
 	#si "sePuede" es verdadero, la palabra se podrá agregar
@@ -62,14 +63,16 @@ def configurarYa():
 	mayusMinu=True
 	colores={"sustantivo":0,"adjetivo":0,"verbo":0}
 	
+	#aqui para que funcione el eliminar y se actualize el multiline, tuve que cambiar por TRUE el "do_not_clear". Si no se cambia esto
+	#el contenido queda fijo y no se actualiza
 	columna_1 =[[sg.Text('Sustantivos')],
-				[sg.Multiline(do_not_clear=True, disabled=False, key='sustantivo')]
+				[sg.Multiline(do_not_clear=False, disabled=False, key='sustantivo')]
 				]
 	columna_2 = [[sg.Text('Adjetivos')],
-				[sg.Multiline(do_not_clear=True, disabled=False, key='adjetivo')]
+				[sg.Multiline(do_not_clear=False, disabled=False, key='adjetivo')]
 				]
 	columna_3 = [[sg.Text('Verbos')],
-				[sg.Multiline(do_not_clear=True, disabled=False, key='verbo')]
+				[sg.Multiline(do_not_clear=False, disabled=False, key='verbo')]
 				]
 			
 	#Armo para la eleccion de colores
@@ -83,7 +86,7 @@ def configurarYa():
 	diseño = [  [sg.Frame('Seleccion de colores', frame_layout)],
 				[sg.Text('Ingreso de palabra'), sg.InputText(key="palabra")],
 				[sg.Text("",size=(60,1),key="out1",text_color="red")],
-				[sg.Submit('Aceptar')],				
+				[sg.Submit('Aceptar'), sg.Button("Eliminar", button_color = ('white', 'red'))],				
 				[sg.Column(columna_1), sg.Column(columna_2), sg.Column(columna_3)],
 				#cantidad a mostrar
 				[sg.Text("Cantidad de sustantivos",size=(18,1)),sg.InputText(key="sustantivo1",size=(5,1))],
@@ -91,7 +94,7 @@ def configurarYa():
 				[sg.Text("Cantidad de adjetivos",size=(18,1)),sg.InputText(key="adjetivo1",size=(5,1))],
 				[sg.Text("",text_color="red",key="adj",size=(20,1))],
 				[sg.Text("Cantidad de verbos",size=(18,1)),sg.InputText(key="verbo1",size=(5,1))],
-				[sg.Text("",text_color="red",key="ver",size=(20,1))],
+				[sg.Text("",text_color="red",key="ver",size=(25,1))],
 				#fin
 				[sg.Text('Orientacion: '), sg.Radio('Horizontal', 'orientacion',default=True,key="h"),  sg.Radio('Vertical', 'orientacion',key="v")],
 				[sg.Text('Tipo de Ayuda: '), sg.Radio('Sin ayuda', 'ayuda',default=True,key="SA"),  sg.Radio('Ayuda mínima', 'ayuda',key="AMin"), sg.Radio('Ayuda máxima', 'ayuda',key="AM")],
@@ -105,12 +108,16 @@ def configurarYa():
 		boton,valores=window.Read()
 		if boton is None:
 			sys.exit(0)
+		eliminada=False
 		if boton =="Aceptar":
 			window.FindElement("out1").Update("")
 			if valores["palabra"] !="":
 				palabra=valores["palabra"]
 				if not palabra.isalpha():
 					window.FindElement("out1").Update("{} no es una palabra".format(str(palabra)))
+					window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+					window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+					window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
 				else:
 					#en la siguiente línea, todos los caracteres son convertidos en minúsculas y se crea el objeto Palabra
 					p = pal.Palabra(palabra.lower())
@@ -120,52 +127,144 @@ def configurarYa():
 					#chequea si se cancelaron los ingresos manuales de tipo y definición de la palabra
 					if p.getDefinicion() == "sinDefinicion":
 						window.FindElement("out1").Update("El ingreso de la palabra '{}' fue cancelado".format(str(palabra)))
-						
+						window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+						window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+						window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)	
 					else:
+						#mirar las siguientes modificaciones para que se tuvo que hacer para el "ELIMINAR"
 						tuplaVerificacion = repetido(p, palabrasXtipo)
 						if tuplaVerificacion[0]:
 							palabrasXtipo[p.esTipo()].append(p)
-							window.FindElement(p.esTipo()).Update(value=str(p.getPalabra()+" "),append=True)
+							#agregado para que se muestre
+							window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+							window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+							window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
 						else:
-							window.FindElement("out1").Update("La palabra '{}' fue agregada anteriormente como {}".format(str(palabra.lower()), tuplaVerificacion[1]))	
+							window.FindElement("out1").Update("La palabra '{}' fue agregada anteriormente como {}".format(str(palabra.lower()), tuplaVerificacion[1]))
+							#agregado para que se muestre
+							window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+							window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+							window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)	
 					
-			else: window.FindElement("out1").Update("Ingrese una palabra")
+			else:
+				window.FindElement("out1").Update("Ingrese una palabra")
+				#agregado para que se muestre
+				window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+				window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+				window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
+			
+		#Funcionalidad nueva para eliminar palabras. Se ha modificado tambien los botones en el multiline de las palabras en configurar. Mirar mas arriba
+		#Tambien tuve que modificar funcionalidades del boton aceptar
+		if boton == "Eliminar":
+			window.FindElement("out1").Update("")
+			if valores["palabra"] !="":
+				palEliminar=valores["palabra"].lower()
+				for clave in palabrasXtipo.keys():
+					for valor in palabrasXtipo[clave]:
+						if valor.getPalabra() == palEliminar:
+							palabrasXtipo[clave].remove(valor)
+							eliminada=True
+				if eliminada==False:
+					window.FindElement("out1").Update('No Exite esa palabra')
+					window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+					window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+					window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
+				else:
+					window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+					window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+					window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
+					window.FindElement("out1").Update("Palabra eliminada correctamente")
+			else:
+				window.FindElement("out1").Update("Ingrese la palabra que desea eliminar")
+				window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+				window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+				window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
+		#hasta aqui el eliminar
+		
+		#Esto que sigue a continuacion es para resolver el problema ocurrido si configuro los colores despues de agregar palabras.
+		#Si esto no esta, al elegir los colores despues de agregar palabras, se deja de mostrar la lista en la pantalla, pero si esta internamente.
+		if boton == "ColVer" or boton == "ColAdj" or boton == "ColSust":
+			if len(palabrasXtipo['sustantivo']) != 0 or len(palabrasXtipo['adjetivo']) != 0 or len(palabrasXtipo['verbo']) != 0:
+				window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+				window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+				window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)		
+		
+		
 		if boton=="Terminar":
-			if not hayPalabras( len(palabrasXtipo["sustantivo"]), len(palabrasXtipo["adjetivo"]),len(palabrasXtipo["verbo"])):
+			if not hayPalabras(len(palabrasXtipo["sustantivo"]), len(palabrasXtipo["adjetivo"]),len(palabrasXtipo["verbo"])):
 				window.FindElement("out1").Update('<INGRESE UNA PALABRA>')	
 				continue
+			
+			#Esto se ha retocado para el eliminar. Simplemente encadeno los if para que sea mas facil mostrar las palabras
 			if valores["sustantivo1"].isdigit():
 				cantidadXtipo["sustantivo"]= int(valores["sustantivo1"])
+				window.FindElement("sus").Update('')
+				if valores["adjetivo1"].isdigit():
+					cantidadXtipo["adjetivo"]= int(valores["adjetivo1"])
+					window.FindElement("adj").Update('')
+					if valores["verbo1"].isdigit():
+						cantidadXtipo["verbo"]= int(valores["verbo1"])
+						window.FindElement("ver").Update('')
+						if cantidadXtipo["sustantivo"] == 0:
+							if cantidadXtipo["adjetivo"] == 0:
+								if cantidadXtipo["verbo"] == 0:
+									window.FindElement("ver").Update('NO PUEDEN SER TODOS 0')
+									#agregado para que se muestre
+									window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+									window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+									window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
+									continue   				
+					else:
+						window.FindElement("ver").Update('<INGRESE UN NUMERO>')
+						#agregado para que se muestre
+						window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+						window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+						window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
+						continue
+				else:
+					window.FindElement("adj").Update('<INGRESE UN NUMERO>')
+					#agregado para que se muestre
+					window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+					window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+					window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
+					continue
 			else:
 				window.FindElement("sus").Update('<INGRESE UN NUMERO>')
-			if valores["adjetivo1"].isdigit():
-				cantidadXtipo["adjetivo"]= int(valores["adjetivo1"])
-			else:
-				window.FindElement("adj").Update('<INGRESE UN NUMERO>')	
-				
-			if valores["verbo1"].isdigit():
-				cantidadXtipo["verbo"]= int(valores["verbo1"])
-			else:
-				window.FindElement("ver").Update('<INGRESE UN NUMERO>')
+				#agregado para que se muestre
+				window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+				window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+				window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
 				continue
-				
+					
+			
 			#chequea que los colores no estén repetidos
 			if valores['ColSust'] == valores['ColAdj']:
 				sg.Popup('ERROR', 'Los colores para sustantivos y adjetivos deben ser distintos. Vuelva a elegirlos')
 				window.FindElement("ColSust").Update('')
 				window.FindElement("ColAdj").Update('')
+				#agregado para que se muestre. Esto es agregado por el ELIMINAR
+				window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+				window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+				window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
 				continue
 			elif valores['ColSust'] == valores['ColVer']:
 				sg.Popup('ERROR', 'Los colores para sustantivos y verbos deben ser distintos. Vuelva a elegirlos')
 				window.FindElement("ColSust").Update('')
 				window.FindElement("ColVer").Update('')
+				#agregado para que se muestre. Esto es agregado por el ELIMINAR
+				window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+				window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+				window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
 				continue
 			elif valores['ColAdj'] == valores['ColVer']:
 				sg.Popup('ERROR', 'Los colores para adjetivos y verbos deben ser distintos. Vuelva a elegirlos')
 				window.FindElement("ColAdj").Update('')
 				window.FindElement("ColVer").Update('')
+				#agregado para que se muestre. Esto es agregado por el ELIMINAR
+				window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+				window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+				window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
 				continue
-				
 			break		
 	
 	
