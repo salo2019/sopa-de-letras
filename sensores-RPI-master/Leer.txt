@@ -1,0 +1,11 @@
+Integrantes de Grupo 34: Salomone Fernando Jorge, Salomone Fabian Edgardo, Tomas Chosco
+
+Ejecutable: prueba.py
+
+Archivo necesario para guardar las temperaturas: oficinas.json
+
+Librerias utilizadas: 
+Librerias de Raspberry
+RPi.GPIO
+luma.led_matrix
+Adafruit_DHT

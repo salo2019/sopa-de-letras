@@ -5,11 +5,11 @@ import string
 import json
 class Palabra:
 	def reporte(self,p,quien):
-		archivoAbrir= open("reporte.txt","r")
+		archivoAbrir= open("archivos de texto/reporte.txt","r")
 		datos= json.load(archivoAbrir)
 		datos[quien].append(p)
 		archivoAbrir.close()
-		archivoGuardar= open("reporte.txt","w")
+		archivoGuardar= open("archivos de texto/reporte.txt","w")
 		json.dump(datos,archivoGuardar)
 		archivoGuardar.close()
 	def verificar(self,p):

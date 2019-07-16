@@ -47,7 +47,7 @@ def hayPalabras(sus,adj,verb):
 	return hay	
 def configurarYa():
 	#calcula las oficinas a mostrar
-	archivo=open("oficinas.txt","r")	
+	archivo=open("archivos de texto/oficinas.txt","r")	
 	datos=json.load(archivo)
 	#genero una lista que va tener radios de las oficinas , utilizo un for ya que levantando el archivo no se cuantas oficinas tengo que poner en listaOfi entonces las creo
 	listaOfi=[sg.Text("Oficina: ")]

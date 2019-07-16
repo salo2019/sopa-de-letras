@@ -1,0 +1,9 @@
+Integrantes de Grupo 34: Salomone Fernando Jorge, Salomone Fabian Edgardo, Tomas Chosco
+
+Archivo ejecutable: jugar.py
+
+Librerias Utilizadas: PySimpleGUI / Pattern
+
+Instalacion de librerias: 
+pip install PySimpleGUI
+pip install pattern
