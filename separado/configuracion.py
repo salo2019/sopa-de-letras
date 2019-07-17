@@ -77,16 +77,16 @@ def configurarYa():
 			
 	#Armo para la eleccion de colores
 	frame_layout = [	  
-					[sg.T('Color Verbos: '), sg.In(change_submits=True, size=(10,1), do_not_clear=True, key='ColVer'), sg.ColorChooserButton('Elegir', target=(sg.ThisRow, -1))],
-					[sg.T('Color Adjetivos: '), sg.In(change_submits=True, size=(10,1), do_not_clear=True, key='ColAdj'), sg.ColorChooserButton('Elegir', target=(sg.ThisRow, -1))],
-					[sg.T('Color Sustantivos: '), sg.In(change_submits=True, size=(10,1), do_not_clear=True, key='ColSust'), sg.ColorChooserButton('Elegir', target=(sg.ThisRow, -1))]
+					[sg.T('Color Verbos: '),sg.T("",size=(10,1), key='ColVer') , sg.ColorChooserButton('Elegir', target=(sg.ThisRow, -1))],
+					[sg.T('Color Adjetivos: '), sg.T("",size=(10,1), key='ColAdj'), sg.ColorChooserButton('Elegir', target=(sg.ThisRow, -1))],
+					[sg.T('Color Sustantivos: '), sg.T("",size=(10,1), key='ColSust'), sg.ColorChooserButton('Elegir', target=(sg.ThisRow, -1))]
 				]	  
 
 	#Armo el diseño de la interface
 	diseño = [  [sg.Frame('Seleccion de colores', frame_layout)],
 				[sg.Text('Ingreso de palabra'), sg.InputText(key="palabra")],
 				[sg.Text("",size=(60,1),key="out1",text_color="red")],
-				[sg.Submit('Aceptar'), sg.Button("Eliminar", button_color = ('white', 'red'))],				
+				[sg.Submit('Aceptar'), sg.Button("Eliminar", button_color = ('white', 'red')),sg.Button("Reportes")],				
 				[sg.Column(columna_1), sg.Column(columna_2), sg.Column(columna_3)],
 				#cantidad a mostrar
 				[sg.Text("Cantidad de sustantivos",size=(18,1)),sg.InputText(key="sustantivo1",size=(5,1))],
@@ -155,6 +155,15 @@ def configurarYa():
 			
 		#Funcionalidad nueva para eliminar palabras. Se ha modificado tambien los botones en el multiline de las palabras en configurar. Mirar mas arriba
 		#Tambien tuve que modificar funcionalidades del boton aceptar
+		
+		if boton == "Reportes":
+			# abro el archivo de reportes,datos  es una lista con los reportes
+			archivoAbrir= open("archivos de texto/reporte.txt","r")
+			datos= json.load(archivoAbrir)
+			nuevo=[[sg.Multiline('\n \n'.join(datos),size=(30,20))]]	
+			w=sg.Window("Reportes").Layout(nuevo)
+			w.Read()	
+			archivoAbrir.close()
 		if boton == "Eliminar":
 			window.FindElement("out1").Update("")
 			if valores["palabra"] !="":
@@ -236,35 +245,48 @@ def configurarYa():
 				window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
 				continue
 					
-			
+			#if valores ['colSust'] is None:
+				 #<ingrese un color>
 			#chequea que los colores no estén repetidos
-			if valores['ColSust'] == valores['ColAdj']:
-				sg.Popup('ERROR', 'Los colores para sustantivos y adjetivos deben ser distintos. Vuelva a elegirlos')
+			try:
+				
+				if valores['ColSust'] == valores['ColAdj']:
+					sg.Popup('ERROR', 'Los colores para sustantivos y adjetivos deben ser distintos. Vuelva a elegirlos')
+					window.FindElement("ColSust").Update('')
+					window.FindElement("ColAdj").Update('')
+					#agregado para que se muestre. Esto es agregado por el ELIMINAR
+					window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+					window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+					window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
+					continue
+				elif valores['ColSust'] == valores['ColVer']:
+					sg.Popup('ERROR', 'Los colores para sustantivos y verbos deben ser distintos. Vuelva a elegirlos')
+					window.FindElement("ColSust").Update('')
+					window.FindElement("ColVer").Update('')
+					#agregado para que se muestre. Esto es agregado por el ELIMINAR
+					window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+					window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+					window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
+					continue
+				elif valores['ColAdj'] == valores['ColVer']:
+					sg.Popup('ERROR', 'Los colores para adjetivos y verbos deben ser distintos. Vuelva a elegirlos')
+					window.FindElement("ColAdj").Update('')
+					window.FindElement("ColVer").Update('')
+					#agregado para que se muestre. Esto es agregado por el ELIMINAR
+					window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+					window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+					window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
+					continue
+			except(KeyError):
+				sg.Popup('ERROR', 'NONE no es un valor válido para seleccionar colores. Vuelva a elegirlos')
 				window.FindElement("ColSust").Update('')
 				window.FindElement("ColAdj").Update('')
-				#agregado para que se muestre. Esto es agregado por el ELIMINAR
-				window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
-				window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
-				window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
-				continue
-			elif valores['ColSust'] == valores['ColVer']:
-				sg.Popup('ERROR', 'Los colores para sustantivos y verbos deben ser distintos. Vuelva a elegirlos')
-				window.FindElement("ColSust").Update('')
 				window.FindElement("ColVer").Update('')
 				#agregado para que se muestre. Esto es agregado por el ELIMINAR
 				window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
 				window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
 				window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
-				continue
-			elif valores['ColAdj'] == valores['ColVer']:
-				sg.Popup('ERROR', 'Los colores para adjetivos y verbos deben ser distintos. Vuelva a elegirlos')
-				window.FindElement("ColAdj").Update('')
-				window.FindElement("ColVer").Update('')
-				#agregado para que se muestre. Esto es agregado por el ELIMINAR
-				window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
-				window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
-				window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
-				continue
+				continue		
 			break		
 	
 	
@@ -304,3 +326,5 @@ def configurarYa():
 
 	
 	return palabrasXtipo,cantidadXtipo,orientacion,ayuda,mayusMinu,colores,color
+
+configurarYa()
