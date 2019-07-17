@@ -55,6 +55,17 @@ def mostrarReportes():
 	archivoAbrir.close()
 #	w.Close()	
 def configurarYa():
+	
+	#Reinicio del archivo de reportes
+	archAbrir= open("archivos de texto/reporte.txt","r")
+	datos_reporte= json.load(archAbrir)
+	datos_reporte = []
+	archAbrir.close()
+	archGuardar= open("archivos de texto/reporte.txt","w")
+	json.dump(datos_reporte,archGuardar)
+	archGuardar.close()
+	
+	
 	#calcula las oficinas a mostrar
 	archivo=open("archivos de texto/oficinas.txt","r")	
 	datos=json.load(archivo)
@@ -168,6 +179,10 @@ def configurarYa():
 		if boton == "Reportes":
 			# abro el archivo de reportes,datos  es una lista con los reportes
 			mostrarReportes()
+			#agregado para que se muestre. Esto es agregado por el ELIMINAR
+			window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+			window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+			window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
 		if boton == "Eliminar":
 			window.FindElement("out1").Update("")
 			if valores["palabra"] !="":
@@ -253,32 +268,42 @@ def configurarYa():
 				 #<ingrese un color>
 			#chequea que los colores no estén repetidos
 			if valores['ColSust'] == valores['ColAdj']:
-					sg.Popup('ERROR', 'Los colores para sustantivos y adjetivos deben ser distintos. Vuelva a elegirlos')
-					window.FindElement("ColSust").Update('')
-					window.FindElement("ColAdj").Update('')
-					#agregado para que se muestre. Esto es agregado por el ELIMINAR
-					window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
-					window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
-					window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
-					continue
+				sg.Popup('ERROR', 'Los colores para sustantivos y adjetivos deben ser distintos. Vuelva a elegirlos')
+				window.FindElement("ColSust").Update('')
+				window.FindElement("ColAdj").Update('')
+				#agregado para que se muestre. Esto es agregado por el ELIMINAR
+				window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+				window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+				window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
+				continue
 			elif valores['ColSust'] == valores['ColVer']:
-					sg.Popup('ERROR', 'Los colores para sustantivos y verbos deben ser distintos. Vuelva a elegirlos')
-					window.FindElement("ColSust").Update('')
-					window.FindElement("ColVer").Update('')
-					#agregado para que se muestre. Esto es agregado por el ELIMINAR
-					window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
-					window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
-					window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
-					continue
+				sg.Popup('ERROR', 'Los colores para sustantivos y verbos deben ser distintos. Vuelva a elegirlos')
+				window.FindElement("ColSust").Update('')
+				window.FindElement("ColVer").Update('')
+				#agregado para que se muestre. Esto es agregado por el ELIMINAR
+				window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+				window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+				window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
+				continue
 			elif valores['ColAdj'] == valores['ColVer']:
-					sg.Popup('ERROR', 'Los colores para adjetivos y verbos deben ser distintos. Vuelva a elegirlos')
-					window.FindElement("ColAdj").Update('')
-					window.FindElement("ColVer").Update('')
-					#agregado para que se muestre. Esto es agregado por el ELIMINAR
-					window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
-					window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
-					window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
-					continue	
+				sg.Popup('ERROR', 'Los colores para adjetivos y verbos deben ser distintos. Vuelva a elegirlos')
+				window.FindElement("ColAdj").Update('')
+				window.FindElement("ColVer").Update('')
+				#agregado para que se muestre. Esto es agregado por el ELIMINAR
+				window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+				window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+				window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
+				continue
+			elif valores["ColSust"].isdigit() or valores["ColAdj"].isdigit() or valores["ColVer"].isdigit():
+				sg.Popup('ERROR', 'El valor de los colores no puede ser un número. Vuelva a elegirlos')
+				window.FindElement("ColSust").Update('')
+				window.FindElement("ColAdj").Update('')
+				window.FindElement("ColVer").Update('')
+				#agregado para que se muestre. Esto es agregado por el ELIMINAR
+				window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+				window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+				window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
+				continue
 			break		
 	
 	
