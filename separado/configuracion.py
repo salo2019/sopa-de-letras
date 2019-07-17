@@ -55,17 +55,6 @@ def mostrarReportes():
 	archivoAbrir.close()
 #	w.Close()	
 def configurarYa():
-	
-	#Reinicio del archivo de reportes
-	archAbrir= open("archivos de texto/reporte.txt","r")
-	datos_reporte= json.load(archAbrir)
-	datos_reporte = []
-	archAbrir.close()
-	archGuardar= open("archivos de texto/reporte.txt","w")
-	json.dump(datos_reporte,archGuardar)
-	archGuardar.close()
-	
-	
 	#calcula las oficinas a mostrar
 	archivo=open("archivos de texto/oficinas.txt","r")	
 	datos=json.load(archivo)
