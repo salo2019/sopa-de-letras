@@ -45,6 +45,15 @@ def hayPalabras(sus,adj,verb):
 	if (sus>0 or adj>0 or verb>0):
 		hay=True
 	return hay	
+def mostrarReportes():
+	archivoAbrir= open("archivos de texto/reporte.txt","r")
+	datos= json.load(archivoAbrir)
+	sg.Popup("\n \n".join(datos))
+	#nuevo=[[sg.Multiline('\n \n'.join(datos),size=(30,20))]]	
+#	w=sg.Window("Reportes").Layout(nuevo)
+#	w.Read()	
+	archivoAbrir.close()
+#	w.Close()	
 def configurarYa():
 	#calcula las oficinas a mostrar
 	archivo=open("archivos de texto/oficinas.txt","r")	
@@ -158,12 +167,7 @@ def configurarYa():
 		
 		if boton == "Reportes":
 			# abro el archivo de reportes,datos  es una lista con los reportes
-			archivoAbrir= open("archivos de texto/reporte.txt","r")
-			datos= json.load(archivoAbrir)
-			nuevo=[[sg.Multiline('\n \n'.join(datos),size=(30,20))]]	
-			w=sg.Window("Reportes").Layout(nuevo)
-			w.Read()	
-			archivoAbrir.close()
+			mostrarReportes()
 		if boton == "Eliminar":
 			window.FindElement("out1").Update("")
 			if valores["palabra"] !="":
@@ -327,4 +331,3 @@ def configurarYa():
 	
 	return palabrasXtipo,cantidadXtipo,orientacion,ayuda,mayusMinu,colores,color
 
-configurarYa()
