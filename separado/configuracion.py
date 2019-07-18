@@ -136,6 +136,7 @@ def configurarYa():
 				[sg.Text('Tipo de Ayuda: '), sg.Radio('Sin ayuda', 'ayuda',default=True,key="SA"),  sg.Radio('Ayuda mínima', 'ayuda',key="AMin"), sg.Radio('Ayuda máxima', 'ayuda',key="AM")],
 				[sg.Text('¿Letras en mayúscula ó minúscula?'), sg.Radio('Letra mayúscula', 'tipo_letra',key="mayus"),  sg.Radio('Letra minúscula', 'tipo_letra',default=True,key="min")],
 				 listaOfi,
+				 [sg.Text('Fuente:'),sg.Radio('Courier 25','fuente',default=True,key='FontA'),sg.Radio('Aharoni',"fuente",key='FontB'),sg.Radio("Verdana","fuente",key='FontC')],
 				[sg.Submit('Terminar')]		
 			]
 
@@ -333,7 +334,12 @@ def configurarYa():
 		mayusMinu=False
 	elif valores["min"] == True:
 		mayusMinu=True
-
+	if valores['FontA']== True:
+		fuente='Courier 25'
+	elif valores['FontB']==True:
+		fuente= 'Aharoni'
+	elif valores['FontC']==True:
+		fuente='Verdana'
 	#busca la clave de la oficina 	
 	for i in list(datos.keys()):
 		if valores[i]==True:
@@ -349,4 +355,4 @@ def configurarYa():
 	window.Close()	
 
 	
-	return palabrasXtipo,cantidadXtipo,orientacion,ayuda,mayusMinu,colores,color
+	return palabrasXtipo,cantidadXtipo,orientacion,ayuda,mayusMinu,colores,color,fuente

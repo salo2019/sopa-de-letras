@@ -37,12 +37,12 @@ def chequearSiPisa(tipo,coordenada,dictio):
 			if coordenada in dictio[i]:
 				dictio[i].remove(coordenada)
 
-def mostrar(matrix,nxn,grph):
+def mostrar(matrix,nxn,grph,fuente):
 	for row in range(nxn):
 		for col in range(nxn):
 			grph.DrawRectangle((col * BOX_SIZE , row * BOX_SIZE ), (col * BOX_SIZE + BOX_SIZE  , row * BOX_SIZE + BOX_SIZE  ), line_color='black')
 			#print((col * BOX_SIZE , row * BOX_SIZE ),(col * BOX_SIZE + BOX_SIZE  , row * BOX_SIZE + BOX_SIZE  ))
-			grph.DrawText(str(matrix[row][col]),(col*BOX_SIZE+18,row*BOX_SIZE+14),font='Courier 25')
+			grph.DrawText(str(matrix[row][col]),(col*BOX_SIZE+18,row*BOX_SIZE+14),font=fuente)
 
 def completar_matriz(mtx,n,m):
 	for i in range(n):
@@ -277,7 +277,7 @@ def completarAyuda(cantLista,cantSust,cantAdj,cantVerbo,lisNue,ayuda):
 		diseño.append([sg.Button('Definiciones')])
 	return diseño
 
-def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop, diccioTodasPalabras):
+def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop, diccioTodasPalabras,fuente):
 	encontradas = []
 	
 	dictioDeClicksDePalabras={"sustantivo":[],"adjetivo":[],"verbo":[]}
@@ -355,7 +355,7 @@ def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop, 
 	window = sg.Window("grafico", resizable=True).Layout(diseño)
 	window.Finalize()
 	grafico= window.FindElement('graph')
-	mostrar(matriz,nxn,grafico)
+	mostrar(matriz,nxn,grafico,fuente)
 	color_predeterminado=colorSop
 	color=color_predeterminado
 
@@ -369,7 +369,7 @@ def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop, 
 	while True:
 		button,values = window.Read()
 		if button is None:
-			break
+			sys.exit(0)
 		mouse = values['graph']
 		mouse= values['graph']
 		# ESTOS 3 IF HACEN QUE CUANDO CAMBIE DE BOTON EL QUE SOY SE MODIFIQUE Y EL COLOR TAMBIEN

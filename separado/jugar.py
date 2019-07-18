@@ -22,10 +22,10 @@ def calcularCantidadIngresadas(cXtipo,pXtipo):
 					n=n+1		
 	return lista	
 def comenzar():
-	palabrasXtipo,cantidadXtipo,orientacion,ayuda,mayusMinu,colores,colorSop=confg.configurarYa()		
+	palabrasXtipo,cantidadXtipo,orientacion,ayuda,mayusMinu,colores,colorSop,fuente=confg.configurarYa()		
 	lista=calcularCantidadIngresadas(cantidadXtipo,palabrasXtipo)
 	#igual que antes pero paso ademas al modulo "palabrasXtipo" (diccionario con clave "tipo" y valor "lista" de todas las palabras) para poder reiniciar las palabras manteniendo el ajuste
-	sopa.juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,cantidadXtipo,colorSop, palabrasXtipo)
+	sopa.juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,cantidadXtipo,colorSop, palabrasXtipo,fuente)
 
 
 comenzar()

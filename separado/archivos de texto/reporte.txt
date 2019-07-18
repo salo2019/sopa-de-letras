@@ -1,1 +1,3 @@
-[]
+[
+    "asdasdasd no se encuentra en wikitionary pero si en pattern como sustantivo."
+]
