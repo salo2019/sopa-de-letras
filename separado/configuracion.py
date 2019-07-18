@@ -54,6 +54,33 @@ def mostrarReportes():
 #	w.Read()	
 	archivoAbrir.close()
 #	w.Close()	
+
+
+def	validarInput(input):
+	ok = False
+	if len(input) == 7 and input[0] == "#":
+		ok = True
+	return ok
+	
+	
+def verificarColoresRepetidos(CSust, CAdj, CVer):
+	listaColRepetidos = []
+	if CSust == CAdj:
+		listaColRepetidos.append('ColSust')
+		listaColRepetidos.append('ColAdj')
+	else:
+		if CSust == CVer:
+			listaColRepetidos.append('ColSust')
+			listaColRepetidos.append('ColVer')
+		else:
+			if CAdj == CVer:
+				listaColRepetidos.append('ColAdj')
+				listaColRepetidos.append('ColVer')
+	
+	return listaColRepetidos
+	
+
+
 def configurarYa():
 	#calcula las oficinas a mostrar
 	archivo=open("archivos de texto/oficinas.txt","r")	
@@ -253,47 +280,38 @@ def configurarYa():
 				window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
 				continue
 					
-			#if valores ['colSust'] is None:
-				 #<ingrese un color>
-			#chequea que los colores no estén repetidos
-			if valores['ColSust'] == valores['ColAdj']:
-				sg.Popup('ERROR', 'Los colores para sustantivos y adjetivos deben ser distintos. Vuelva a elegirlos')
-				window.FindElement("ColSust").Update('')
-				window.FindElement("ColAdj").Update('')
-				#agregado para que se muestre. Esto es agregado por el ELIMINAR
-				window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
-				window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
-				window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
-				continue
-			elif valores['ColSust'] == valores['ColVer']:
-				sg.Popup('ERROR', 'Los colores para sustantivos y verbos deben ser distintos. Vuelva a elegirlos')
-				window.FindElement("ColSust").Update('')
-				window.FindElement("ColVer").Update('')
-				#agregado para que se muestre. Esto es agregado por el ELIMINAR
-				window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
-				window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
-				window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
-				continue
-			elif valores['ColAdj'] == valores['ColVer']:
-				sg.Popup('ERROR', 'Los colores para adjetivos y verbos deben ser distintos. Vuelva a elegirlos')
-				window.FindElement("ColAdj").Update('')
-				window.FindElement("ColVer").Update('')
-				#agregado para que se muestre. Esto es agregado por el ELIMINAR
-				window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
-				window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
-				window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
-				continue
-			elif valores["ColSust"].isdigit() or valores["ColAdj"].isdigit() or valores["ColVer"].isdigit():
-				sg.Popup('ERROR', 'El valor de los colores no puede ser un número. Vuelva a elegirlos')
+		
+			
+			
+			#Chequeo de colores repetidos
+			if validarInput(valores["ColSust"]) == False or validarInput(valores["ColAdj"]) == False or validarInput(valores["ColVer"]) == False:
+				sg.Popup('ERROR','Los colores deben ser seleccionados nuevamente por error de carga. Si desea seleccionar un color de la manera adecuada, presione el botón "Elegir" en la categoría correspondiente. A continuación, marque el color y haga click en "Aceptar"')
 				window.FindElement("ColSust").Update('')
 				window.FindElement("ColAdj").Update('')
 				window.FindElement("ColVer").Update('')
-				#agregado para que se muestre. Esto es agregado por el ELIMINAR
+				#agregado para que se muestre
 				window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
 				window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
 				window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
 				continue
+			else: 
+				listaRepetidos = verificarColoresRepetidos(valores['ColSust'], valores['ColAdj'], valores['ColVer'])
+				if len(listaRepetidos) > 0:
+					sg.Popup('ERROR','Los colores para sustantivos, adjetivos y verbos deben ser diferentes. Vuelva a seleccionar los colores repetidos')
+					window.FindElement(listaRepetidos[0]).Update('')
+					window.FindElement(listaRepetidos[1]).Update('')
+					#agregado para que se muestre
+					window.FindElement('sustantivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['sustantivo'])),append=True)
+					window.FindElement('adjetivo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['adjetivo'])),append=True)
+					window.FindElement('verbo').Update(value=list(map(lambda x: x.getPalabra(),palabrasXtipo['verbo'])),append=True)
+					continue
 			break		
+	
+
+
+		
+		
+	
 	
 	
 	colores['sustantivo']=valores['ColSust']

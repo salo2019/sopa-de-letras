@@ -10,7 +10,7 @@ class Palabra:
         datos.append(mensaje)
         archivoAbrir.close()
         archivoGuardar= open("archivos de texto/reporte.txt","w")
-        json.dump(datos,archivoGuardar)
+        json.dump(datos,archivoGuardar,indent=4)
         archivoGuardar.close()
     def verificar(self,p):
             wiki= self.verificar_wiktionary(p)
