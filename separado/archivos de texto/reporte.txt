@@ -1,3 +1,4 @@
 [
-    "asdasdasd no se encuentra en wikitionary pero si en pattern como sustantivo."
+    "asdasdasd no se encuentra en wikitionary pero si en pattern como sustantivo.",
+    "bai\u00f1ar no se encuentra en wikitionary pero si en pattern como sustantivo."
 ]

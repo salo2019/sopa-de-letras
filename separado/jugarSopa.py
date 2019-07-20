@@ -121,7 +121,7 @@ def procesar_palabras(matriz,nxn,palabras,orient,dictio,m):
 	return matriz
 
 
-def resultado(errores,lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop, diccioTodasPalabras, ok):
+def resultado(errores,lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop, diccioTodasPalabras, ok, fuente):
 	cadena = ''
 	#Linea Nueva. Esta lista es para cuando quiera volver a hacer la eleccion de palabras aleatorias. Ver linea 474	
 	lnue=[]
@@ -162,12 +162,12 @@ def resultado(errores,lista,orientacion,ayuda,colores,mayusMinu,diccionario,colo
 		#permito reiniciar el juego con el mismo ajuste y las mismas palabras
 		if button=="Reiniciar Juego con las mismas palabras":
 			window.Close()
-			juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop, diccioTodasPalabras)
+			juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop, diccioTodasPalabras, fuente)
 		#permito reiniciar el juego con el mismo ajuste y otras palabras aleatorias
 		if button=="Reiniciar con otras palabras Manteniendo el Ajuste":
 			window.Close()
 			lnue = calcularCantidadIngresadas(diccionario, diccioTodasPalabras)
-			juego_nuevo(lnue, orientacion, ayuda, colores, mayusMinu, diccionario, colorSop, diccioTodasPalabras)
+			juego_nuevo(lnue, orientacion, ayuda, colores, mayusMinu, diccionario, colorSop, diccioTodasPalabras, fuente)
 		#permito reiniciar desde cero	
 		if button=="Volver a Ajustes":
 			window.Close()
@@ -417,4 +417,4 @@ def juego_nuevo(lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop, 
 		if button is 'Listo':
 			window.Close()
 			errores,ok=terminar(dictioPalabrasAbuscar,dictioDeClicksDePalabras,colores,matriz_control,ok,encontradas,lista,lisNue)
-			resultado(errores,lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop, diccioTodasPalabras, ok)
+			resultado(errores,lista,orientacion,ayuda,colores,mayusMinu,diccionario,colorSop, diccioTodasPalabras,ok, fuente)
