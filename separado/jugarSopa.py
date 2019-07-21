@@ -150,7 +150,7 @@ def resultado(errores,lista,orientacion,ayuda,colores,mayusMinu,diccionario,colo
 	
 	
 	window = sg.Window("grafico", resizable=True).Layout(diseño)
-#	window.Finalize()
+#window.Finalize()
 	
 	while True:
 		button,values=window.Read()
@@ -171,8 +171,9 @@ def resultado(errores,lista,orientacion,ayuda,colores,mayusMinu,diccionario,colo
 		#permito reiniciar desde cero	
 		if button=="Volver a Ajustes":
 			window.Close()
-			import jugar as game
-# funcion terminar	
+			from jugar import comenzar
+			comenzar()
+#funcion terminar	
 def terminar(dictioPalabrasAbuscar,dictioDeClicksDePalabras,colores,matriz_control,ok,encontradas,lista,lisNue):
 	
 	#linea Nueva.... esto es para contar por si hay clicks de mas	

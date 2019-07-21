@@ -48,7 +48,7 @@ def hayPalabras(sus,adj,verb):
 def mostrarReportes():
 	archivoAbrir= open("archivos de texto/reporte.txt","r")
 	datos= json.load(archivoAbrir)
-	sg.Popup("\n \n".join(datos))
+	sg.Popup("REPORTES WIKTIO / PATTERN:", "\n \n".join(datos))
 	#nuevo=[[sg.Multiline('\n \n'.join(datos),size=(30,20))]]	
 #	w=sg.Window("Reportes").Layout(nuevo)
 #	w.Read()	

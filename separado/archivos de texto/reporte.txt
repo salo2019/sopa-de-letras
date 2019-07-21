@@ -1,4 +1,4 @@
 [
-    "asdasdasd no se encuentra en wikitionary pero si en pattern como sustantivo.",
-    "bai\u00f1ar no se encuentra en wikitionary pero si en pattern como sustantivo."
+    "reir no se encuentra en wikitionary pero si en pattern como verbo.",
+    "mono se encuentra en wikitionary como adjetivo y en pattern como sustantivo, se toma la clasificacion de wikitionary."
 ]
