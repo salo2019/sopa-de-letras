@@ -148,7 +148,7 @@ def configurarYa():
 		eliminada=False
 		if boton =="Aceptar":
 			window.FindElement("out1").Update("")
-			if valores["palabra"] !="":
+			if valores["palabra"] !="" and len(valores["palabra"])>1:
 				palabra=valores["palabra"]
 				if not palabra.isalpha():
 					window.FindElement("out1").Update("{} no es una palabra".format(str(palabra)))

@@ -63,12 +63,16 @@ class Palabra:
                 #se cierra la ventana. Si presiona "Cancelar", la ventana se cierra y los valores son iguales a None
                 window.Close()
                 return tipo,valores["definicion"]
-            else:
-                msj_reporte= "{} no se encuentra en wikitionary ni en pattern.".format(p)
+            elif wiki[1]==True and pattern[1]==False:
+                msj_reporte= "{} se encuentra en wikitionary y no en pattern.".format(p)
                 #print(msj_reporte)
                 self.reporte(msj_reporte)
+                return wiki[0],wiki[2]
+            elif wiki[1]==False and pattern[1]==False:
+                msj_reporte= "{} no se encuentra en wikitionary ni en pattern.".format(p)
+                self.reporte(msj_reporte)
                 diseñoo=[
-                        [sg.Text("Ingrese una definición de ",str(p)),sg.InputText(key="definicion")],
+                        [sg.Text("Ingrese una definición"),sg.InputText(key="definicion")],
                         [sg.Text("Tipo"),sg.Radio('Sustantivo','tipo',key="sustantivo", default=True),sg.Radio('Adjetivo','tipo',key="adjetivo"),sg.Radio('Verbo','tipo',key="verbo")],
                         [sg.Submit("Agregar"), sg.Submit("Cancelar")]
                         ]
@@ -94,17 +98,16 @@ class Palabra:
                         valores["definicion"] = "sinDefinicion"
                         break
 
-                #se cierra ventana. Si presiona "Cancelar", la ventana se cierra y los valores son iguales a None
+                #se cierra la ventana. Si presiona "Cancelar", la ventana se cierra y los valores son iguales a None
                 window.Close()
-
                 return tipo,valores["definicion"]
-
     def verificar_wiktionary(self,palabra):
         w = Wiktionary(language="es")
         article = w.search(palabra)
         # si la palabra no la encuentra article = None
         #print(article)
         esClasificado=False
+        cadena=""
         if not article is None:
             for section in article.sections:
                 if 'ustantiv' in section.title:
@@ -173,7 +176,7 @@ class Palabra:
             pTipo="adjetivo"
         else:
             clasificacion=False
-            pTipo="problema_pattern"
+            pTipo="problema_pattern"   
         return [pTipo,clasificacion]
     def __init__(self,p):
         self.tipo,self.definicion= self.verificar(p)

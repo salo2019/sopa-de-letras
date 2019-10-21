@@ -1,4 +1,14 @@
 [
     "reir no se encuentra en wikitionary pero si en pattern como verbo.",
-    "mono se encuentra en wikitionary como adjetivo y en pattern como sustantivo, se toma la clasificacion de wikitionary."
+    "mono se encuentra en wikitionary como adjetivo y en pattern como sustantivo, se toma la clasificacion de wikitionary.",
+    "a no se encuentra en wikitionary ni en pattern.",
+    "auiehiesfi no se encuentra en wikitionary pero si en pattern como sustantivo.",
+    "sa se encuentra en wikitionary como adjetivo y en pattern como verbo, se toma la clasificacion de wikitionary.",
+    "asdasdasd no se encuentra en wikitionary pero si en pattern como sustantivo.",
+    "s no se encuentra en wikitionary pero si en pattern como sustantivo.",
+    "s no se encuentra en wikitionary pero si en pattern como sustantivo.",
+    "s no se encuentra en wikitionary pero si en pattern como sustantivo.",
+    "s no se encuentra en wikitionary pero si en pattern como sustantivo.",
+    "a se encuentra en wikitionary y no en pattern.",
+    "asesino se encuentra en wikitionary como adjetivo y en pattern como sustantivo, se toma la clasificacion de wikitionary."
 ]
